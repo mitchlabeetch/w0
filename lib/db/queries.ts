@@ -1,26 +1,8 @@
 import 'server-only'
 
-import {
-  and,
-  asc,
-  count,
-  desc,
-  eq,
-  gt,
-  gte,
-  inArray,
-  lt,
-  type SQL,
-} from 'drizzle-orm'
+import { and, count, desc, eq, gte } from 'drizzle-orm'
 
-import {
-  users,
-  chat_ownerships,
-  anonymous_chat_logs,
-  type User,
-  type ChatOwnership,
-  type AnonymousChatLog,
-} from './schema'
+import { users, chats, type User } from './schema'
 import { generateUUID } from '../utils'
 import { generateHashedPassword } from './utils'
 import db from './connection'
@@ -71,7 +53,6 @@ export async function createGuestUser(): Promise<User[]> {
   }
 }
 
-// Chat ownership functions
 export async function createChatOwnership({
   v0ChatId,
   userId,
@@ -80,45 +61,35 @@ export async function createChatOwnership({
   userId: string
 }) {
   try {
-    return await db
-      .insert(chat_ownerships)
-      .values({
-        v0_chat_id: v0ChatId,
-        user_id: userId,
-      })
-      .onConflictDoNothing({ target: chat_ownerships.v0_chat_id })
+    return await db.insert(chats).values({
+      id: v0ChatId,
+      user_id: userId,
+    })
   } catch (error) {
-    console.error('Failed to create chat ownership in database')
+    console.error('Failed to create chat in database')
     throw error
   }
 }
 
 export async function getChatOwnership({ v0ChatId }: { v0ChatId: string }) {
   try {
-    const [ownership] = await db
-      .select()
-      .from(chat_ownerships)
-      .where(eq(chat_ownerships.v0_chat_id, v0ChatId))
-    return ownership
+    const [chat] = await db.select().from(chats).where(eq(chats.id, v0ChatId))
+    return chat
   } catch (error) {
-    console.error('Failed to get chat ownership from database')
+    console.error('Failed to get chat from database')
     throw error
   }
 }
 
-export async function getChatIdsByUserId({
-  userId,
-}: {
-  userId: string
-}): Promise<string[]> {
+export async function getChatIdsByUserId({ userId }: { userId: string }): Promise<string[]> {
   try {
-    const ownerships = await db
-      .select({ v0ChatId: chat_ownerships.v0_chat_id })
-      .from(chat_ownerships)
-      .where(eq(chat_ownerships.user_id, userId))
-      .orderBy(desc(chat_ownerships.created_at))
+    const userChats = await db
+      .select({ id: chats.id })
+      .from(chats)
+      .where(eq(chats.user_id, userId))
+      .orderBy(desc(chats.created_at))
 
-    return ownerships.map((o: { v0ChatId: string }) => o.v0ChatId)
+    return userChats.map((chat: { id: string }) => chat.id)
   } catch (error) {
     console.error('Failed to get chat IDs by user from database')
     throw error
@@ -127,16 +98,13 @@ export async function getChatIdsByUserId({
 
 export async function deleteChatOwnership({ v0ChatId }: { v0ChatId: string }) {
   try {
-    return await db
-      .delete(chat_ownerships)
-      .where(eq(chat_ownerships.v0_chat_id, v0ChatId))
+    return await db.delete(chats).where(eq(chats.id, v0ChatId))
   } catch (error) {
-    console.error('Failed to delete chat ownership from database')
+    console.error('Failed to delete chat from database')
     throw error
   }
 }
 
-// Rate limiting functions
 export async function getChatCountByUserId({
   userId,
   differenceInHours,
@@ -148,14 +116,9 @@ export async function getChatCountByUserId({
     const hoursAgo = new Date(Date.now() - differenceInHours * 60 * 60 * 1000)
 
     const [stats] = await db
-      .select({ count: count(chat_ownerships.id) })
-      .from(chat_ownerships)
-      .where(
-        and(
-          eq(chat_ownerships.user_id, userId),
-          gte(chat_ownerships.created_at, hoursAgo),
-        ),
-      )
+      .select({ count: count(chats.id) })
+      .from(chats)
+      .where(and(eq(chats.user_id, userId), gte(chats.created_at, hoursAgo)))
 
     return stats?.count || 0
   } catch (error) {
@@ -171,24 +134,9 @@ export async function getChatCountByIP({
   ipAddress: string
   differenceInHours: number
 }): Promise<number> {
-  try {
-    const hoursAgo = new Date(Date.now() - differenceInHours * 60 * 60 * 1000)
-
-    const [stats] = await db
-      .select({ count: count(anonymous_chat_logs.id) })
-      .from(anonymous_chat_logs)
-      .where(
-        and(
-          eq(anonymous_chat_logs.ip_address, ipAddress),
-          gte(anonymous_chat_logs.created_at, hoursAgo),
-        ),
-      )
-
-    return stats?.count || 0
-  } catch (error) {
-    console.error('Failed to get chat count by IP from database')
-    throw error
-  }
+  void ipAddress
+  void differenceInHours
+  return 0
 }
 
 export async function createAnonymousChatLog({
@@ -198,13 +146,7 @@ export async function createAnonymousChatLog({
   ipAddress: string
   v0ChatId: string
 }) {
-  try {
-    return await db.insert(anonymous_chat_logs).values({
-      ip_address: ipAddress,
-      v0_chat_id: v0ChatId,
-    })
-  } catch (error) {
-    console.error('Failed to create anonymous chat log in database')
-    throw error
-  }
+  void ipAddress
+  void v0ChatId
+  return
 }
