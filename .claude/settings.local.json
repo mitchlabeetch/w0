@@ -9,7 +9,8 @@
       "Bash(git add *)",
       "Bash(git commit -m 'Refactor: Merge w0 subdir into root with enhanced features *)",
       "Bash(git push *)",
-      "Bash(git commit -m 'docs: Add comprehensive documentation v0.4.0 *)"
+      "Bash(git commit -m 'docs: Add comprehensive documentation v0.4.0 *)",
+      "Bash(git commit -m 'feat: Add statusline-setup agent *)"
     ]
   }
 }

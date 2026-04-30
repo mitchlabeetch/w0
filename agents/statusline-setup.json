@@ -1,0 +1,82 @@
+{
+  "name": "statusline-setup",
+  "subagent_type": "statusline-setup",
+  "prompt": "Configure my statusLine from my shell PS1 configuration",
+  "version": "1.0.0",
+  "description": "Parses shell PS1 configurations and converts them to tmux statuslines or other terminal status formats",
+  "capabilities": {
+    "parse_ps1": {
+      "description": "Parse existing PS1/PROMPT strings",
+      "components": ["user", "host", "directory", "git_branch", "git_status", "time", "date"]
+    },
+    "convert_format": {
+      "description": "Convert PS1 to various output formats",
+      "formats": ["tmux", "bash", "zsh", "starship", "screen"]
+    },
+    "presets": {
+      "minimal": "Basic status with host and time",
+      "git-aware": "Git branch and status indicators",
+      "powerline": "Powerline-style segmented display",
+      "full": "Complete status with all information"
+    }
+  },
+  "presets": {
+    "minimal": {
+      "left": "#{host_short} #{b:pane_title}",
+      "right": "%H:%M %d"
+    },
+    "git-aware": {
+      "left": "git (#{git_current_branch} #{git_status}) #{b:pane_title}",
+      "right": "%H:%M %d"
+    },
+    "powerline": {
+      "left": "#{b:pane_title} | git:#{git_current_branch} | path:#{b:pane_current_path}",
+      "right": "%H:%M | %d"
+    },
+    "full": {
+      "left": "host:#{host_short} | session:#S | pane:#{b:pane_title} | path:#{b:pane_current_path}",
+      "right": "git:#{git_current_branch} #{git_status} | time:%H:%M | date:%d-%m-%Y"
+    }
+  },
+  "color_schemes": {
+    "default": {
+      "bg": "#1e1e1e",
+      "fg": "#cccccc"
+    },
+    "dracula": {
+      "bg": "#282a36",
+      "fg": "#f8f8f2",
+      "accent": "#bd93f9"
+    },
+    "nord": {
+      "bg": "#2e3440",
+      "fg": "#eceff4",
+      "accent": "#88c0d0"
+    },
+    "monokai": {
+      "bg": "#272822",
+      "fg": "#f8f8f2",
+      "accent": "#a6e22e"
+    }
+  },
+  "ps1_mapping": {
+    "\u": "#{host_short}",
+    "\h": "#{host_short}",
+    "\w": "#{b:pane_current_path}",
+    "\W": "#{b:pane_title}",
+    "$(git branch)": "#{git_current_branch}",
+    "\t": "%H:%M",
+    "\d": "%d"
+  },
+  "examples": [
+    {
+      "description": "Parse a bash PS1",
+      "input": "\[\e[1;32m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]$ ",
+      "output": "tmux statusline format"
+    },
+    {
+      "description": "Generate git-aware tmux config",
+      "command": "./statusline-setup.sh --preset git-aware --format tmux"
+    }
+  ]
+}
