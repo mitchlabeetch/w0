@@ -16,8 +16,6 @@ export async function GET(
     const session = await auth()
     const { chatId } = await params
 
-    console.log('Fetching chat details for ID:', chatId)
-
     if (!chatId) {
       return NextResponse.json(
         { error: 'Chat ID is required' },
@@ -38,13 +36,10 @@ export async function GET(
       }
     } else {
       // Anonymous user - allow access to any chat (they can only access via direct URL)
-      console.log('Anonymous access to chat:', chatId)
     }
 
     // Fetch chat details using v0 SDK
     const chatDetails = await v0.chats.getById({ chatId })
-
-    console.log('Chat details fetched:', chatDetails)
 
     return NextResponse.json(chatDetails)
   } catch (error) {

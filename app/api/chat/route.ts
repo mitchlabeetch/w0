@@ -61,7 +61,6 @@ export async function POST(request: NextRequest) {
       }
 
       console.log('API request:', {
-        message,
         chatId,
         streaming,
         userId: session.user.id,
@@ -79,7 +78,6 @@ export async function POST(request: NextRequest) {
       }
 
       console.log('API request (anonymous):', {
-        message,
         chatId,
         streaming,
         ip: clientIP,
@@ -96,7 +94,6 @@ export async function POST(request: NextRequest) {
         // Return streaming response for existing chat
         console.log('Sending streaming message to existing chat:', {
           chatId,
-          message,
           responseMode: 'experimental_stream',
         })
         chat = await v0.chats.sendMessage({
@@ -128,7 +125,6 @@ export async function POST(request: NextRequest) {
       if (streaming) {
         // Return streaming response
         console.log('Creating streaming chat with params:', {
-          message,
           responseMode: 'experimental_stream',
         })
         chat = await v0.chats.create({
@@ -149,7 +145,6 @@ export async function POST(request: NextRequest) {
       } else {
         // Use sync mode
         console.log('Creating sync chat with params:', {
-          message,
           responseMode: 'sync',
         })
         chat = await v0.chats.create({
