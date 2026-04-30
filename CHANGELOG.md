@@ -1,6 +1,67 @@
 # v0-clone
 
-## 0.3.4
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.4.0] - 2025-04-30
+
+### Major Changes
+
+- **Repository Restructure**: Merged w0 subdirectory into root with all enhanced features
+- **Enhanced Architecture**: Full multi-tenant support with IP-based rate limiting
+- **Improved Streaming**: Real-time streaming with `experimental_stream` mode
+- **Comprehensive AI Elements**: Full support for all task types with graceful fallback
+
+### Added
+
+- **API Routes**:
+  - `/api/chat` - Chat creation with streaming and ownership tracking
+  - `/api/chat/delete` - Chat deletion via v0 SDK
+  - `/api/chat/fork` - Chat forking/duplication
+  - `/api/chat/ownership` - Ownership record creation
+  - `/api/chats` - User's chat listing
+  - `/api/chats/[chatId]` - Individual chat access and updates
+  - `/api/chats/[chatId]/visibility` - Privacy control (public/private/team)
+  - `/api/auth/guest` - Guest auto-login
+  - `/api/auth/[...nextauth]` - NextAuth v5 handlers
+
+- **Components**:
+  - AI Elements: Message, Conversation, Branch, Reasoning, Task, Tool, CodeBlock, etc.
+  - Chat: ChatInput, ChatMessages, PreviewPanel with resizable layout
+  - Shared: AppHeader, ChatSelector, BottomToolbar, MobileMenu
+  - UI: Full shadcn/ui component library (15+ components)
+
+- **Database Schema** (Drizzle ORM):
+  - `users` - User accounts with email/password
+  - `chats` - Chat ownership with visibility settings
+  - `messages` - Chat messages with role support
+  - `system_prompts` - Custom system prompts per user
+  - `llm_configurations` - LLM provider settings
+  - `anonymous_chat_logs` - Rate limiting for anonymous users
+
+- **Authentication**:
+  - Anonymous access (3 chats/day rate limit)
+  - Guest auto-creation (5 chats/day)
+  - Email/password registration (50 chats/day)
+  - NextAuth.js v5 with JWT sessions
+
+- **Features**:
+  - Resizable split-panel interface
+  - Image attachments for prompts
+  - Voice input (Web Speech API)
+  - Session persistence (sessionStorage)
+  - Dark/light theme toggle
+
+### Changed
+
+- Updated README with comprehensive documentation
+- Fixed Turbopack root configuration warning
+- Improved error handling with ChatSDKError class
+- Enhanced message preprocessing (V0_FILE markers cleanup)
+
+## [0.3.4]
 
 ### Patch Changes
 
